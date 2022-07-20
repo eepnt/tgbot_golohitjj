@@ -1,0 +1,9 @@
+runtime: python39
+
+entrypoint: gunicorn -w 1 -b :$PORT gae_default:app
+
+instance_class: F4_1G
+
+env_variables:
+  USER_GAE_PROJECT_ID: 1084173681698
+  USER_TG_GROUP_ID: -1001515240020
