@@ -1,0 +1,5 @@
+Flask==2.0.2
+google-cloud-secret-manager
+requests
+google-cloud-logging
+google-cloud-storage

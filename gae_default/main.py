@@ -26,8 +26,6 @@ tgbot_token = secretmanager.SecretManagerServiceClient().access_secret_version(
 
 app = flask.Flask(__name__)
 
-import has_human
-
 @app.route('/', methods=["POST"])
 def recv_tgmsg():
     try:
@@ -39,11 +37,14 @@ def recv_tgmsg():
             tgbot_token, data["message"]["photo"][-1]["file_id"],
         )).json()
         logging.info(get_file)
-        rt = has_human.has_human('https://api.telegram.org/file/bot{}/{}'.format(
-            tgbot_token, get_file["result"]["file_path"],
-        ))
 
-        if not rt:
+        result = requests.post('https://human-dot-goloscorerbot.dt.r.appspot.com', json={
+            'link':'https://api.telegram.org/file/bot{}/{}'.format(tgbot_token, get_file["result"]["file_path"]),
+        })
+
+        if result.text == 'TRUE':
+            return ""
+        elif result.text == 'FALSE':
             return {
                 "method": "sendMessage",
                 "chat_id": data["message"]["chat"]["id"],
@@ -51,7 +52,10 @@ def recv_tgmsg():
                 "reply_to_message_id": data["message"]["message_id"],
             }
         else:
+            logging.error(result)
             return ""
+
+        # storage:
         # storage_client.bucket('golo_bucket').blob(
         #     '{}.{}'.format(data["message"]["photo"][-1]["file_id"], get_file["result"]["file_path"].split('.')[-1])
         # ).upload_from_string(file, content_type="image/jpeg")
