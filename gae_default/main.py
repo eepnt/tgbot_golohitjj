@@ -3,9 +3,9 @@ import flask, logging, requests, os
 import google.cloud.logging
 google.cloud.logging.Client().setup_logging()
 
-# # gcp cloud storage
-# from google.cloud import storage
-# storage_client = storage.Client()
+# gcp cloud storage
+from google.cloud import storage
+storage_client = storage.Client()
 
 # get cloud debugger
 try:
@@ -38,9 +38,9 @@ def recv_tgmsg():
         )).json()
         logging.info(get_file)
 
-        result = requests.post('https://human-dot-goloscorerbot.dt.r.appspot.com', json={
-            'link':'https://api.telegram.org/file/bot{}/{}'.format(tgbot_token, get_file["result"]["file_path"]),
-        })
+        file_link = 'https://api.telegram.org/file/bot{}/{}'.format(tgbot_token, get_file["result"]["file_path"]) 
+
+        result = requests.post('https://human-dot-goloscorerbot.dt.r.appspot.com', json={'link':file_link})
 
         if result.text == 'TRUE':
             return ""
@@ -56,14 +56,17 @@ def recv_tgmsg():
             return ""
 
         # storage:
-        # storage_client.bucket('golo_bucket').blob(
-        #     '{}.{}'.format(data["message"]["photo"][-1]["file_id"], get_file["result"]["file_path"].split('.')[-1])
-        # ).upload_from_string(file, content_type="image/jpeg")
 
     except Exception as e:
         import traceback
         logging.error(''.join(traceback.format_exception(type(e), e, e.__traceback__)))
         return ""
+    finally:
+        file = requests.get(file_link).content
+        storage_client.bucket('golo_bucket').blob(
+            '{}.{}'.format(data["message"]["photo"][-1]["file_id"], get_file["result"]["file_path"].split('.')[-1])
+        ).upload_from_string(file, content_type="image/jpeg")
+        
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
