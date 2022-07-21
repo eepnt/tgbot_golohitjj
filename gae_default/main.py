@@ -28,6 +28,7 @@ app = flask.Flask(__name__)
 
 @app.route('/', methods=["POST"])
 def recv_tgmsg():
+    file_link = None
     try:
         data = flask.request.get_json()
         if "message" not in data or "photo" not in data["message"]:
@@ -62,10 +63,11 @@ def recv_tgmsg():
         logging.error(''.join(traceback.format_exception(type(e), e, e.__traceback__)))
         return ""
     finally:
-        file = requests.get(file_link).content
-        storage_client.bucket('golo_bucket').blob(
-            '{}.{}'.format(data["message"]["photo"][-1]["file_id"], get_file["result"]["file_path"].split('.')[-1])
-        ).upload_from_string(file, content_type="image/jpeg")
+        if file_link is not None:
+            file = requests.get(file_link).content
+            storage_client.bucket('golo_bucket').blob(
+                '{}.{}'.format(data["message"]["photo"][-1]["file_id"], get_file["result"]["file_path"].split('.')[-1])
+            ).upload_from_string(file, content_type="image/jpeg")
         
 
 if __name__ == '__main__':

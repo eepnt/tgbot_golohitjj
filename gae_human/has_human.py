@@ -1,10 +1,10 @@
 # serve model
 import six
 import six.moves.urllib.request
+import PIL.Image
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
-import PIL.Image
 
 # logging
 import logging
@@ -49,7 +49,7 @@ def has_human(path):
     # id 1 = human. ref:
     # https://github.com/tensorflow/models/blob/master/research/object_detection/data/mscoco_label_map.pbtxt
     for i in filter(lambda x: x['obj'] == 1, rt):
-        if i['score'] > 0.6:
+        if i['score'] > 0.5:
             found = True
             break
     return found
