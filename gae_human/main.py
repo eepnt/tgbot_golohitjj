@@ -12,19 +12,23 @@ try:
 except ImportError:
   print('cannot load cloud debugger')
 
-app = flask.Flask(__name__)
+import has_girl
 
-import has_human
+app = flask.Flask(__name__)
 
 @app.route('/', methods=["POST"])
 def recv_request():
     try:
         data = flask.request.get_json()
-        logging.info(data)
 
-        rt = has_human.has_human(data["link"])
+        rt = has_girl.has_girl(data["link"])
+        
+        logging.info({
+          "req": data,
+          "resp": rt,
+        })
 
-        if rt:
+        if rt < 0:
             return "TRUE"
         else:
             return "FALSE"

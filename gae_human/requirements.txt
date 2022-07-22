@@ -4,5 +4,3 @@ requests
 google-cloud-logging
 numpy==1.21.6
 tensorflow==2.9.1
-tensorflow-hub
-pillow==9.2.0
