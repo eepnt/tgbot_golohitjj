@@ -4,12 +4,14 @@ service: human
 
 entrypoint: gunicorn -w 1 -b :$PORT main:app
 
-instance_class: B4
+instance_class: F4
 
 env_variables:
   USER_GAE_PROJECT_ID: 1084173681698
   USER_TG_GROUP_ID: -1001515240020
 
-basic_scaling:
+# basic_scaling:
+#   max_instances: 1
+#   idle_timeout: 5m
+automatic_scaling:
   max_instances: 1
-  idle_timeout: 5m

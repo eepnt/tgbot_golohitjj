@@ -34,7 +34,7 @@ def load_image_into_numpy_array(path):
 #   (im_width, im_height) = image.size
 #   return np.array(image.getdata()).reshape((1, im_height, im_width, 3)).astype(np.uint8)
 
-def has_human(path):
+def has_girl(path):
     image_np = load_image_into_numpy_array(path)
     image_np_resized = tf.image.resize(image_np, (160, 160))
     result = model(image_np_resized)    
