@@ -8,7 +8,10 @@ tf.get_logger().setLevel('ERROR')
 from tensorflow.python.ops.numpy_ops import np_config
 np_config.enable_numpy_behavior()
 
-model = tf.keras.models.load_model('./model')
+interpreter = tf.lite.Interpreter(model_path="./model.tflite")
+interpreter.allocate_tensors()
+output = interpreter.get_output_details()[0]
+input = interpreter.get_input_details()[0]
 
 def load_image_into_numpy_array(path):
   image = None
@@ -37,13 +40,17 @@ def load_image_into_numpy_array(path):
 def has_girl(path):
     image_np = load_image_into_numpy_array(path)
     image_np_resized = tf.image.resize(image_np, (160, 160))
-    result = model(image_np_resized)    
+
+    interpreter.set_tensor(input['index'], image_np_resized)
+    interpreter.invoke()
+    result = interpreter.get_tensor(output['index']).item()
+
     return float(result)
 
 if __name__ == '__main__':
     # true
-    print(has_human('https://assets.burberry.com/is/image/Burberryltd/440338C3-9706-448C-B71E-B2C71D43B4DF?$BBY_V2_ML_1x1$&wid=998&hei=998'))
+    print(has_girl('https://assets.burberry.com/is/image/Burberryltd/440338C3-9706-448C-B71E-B2C71D43B4DF?$BBY_V2_ML_1x1$&wid=998&hei=998'))
     # false
-    print(has_human('https://images.unsplash.com/photo-1461800919507-79b16743b257?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8&w=1000&q=80'))
+    print(has_girl('https://images.unsplash.com/photo-1461800919507-79b16743b257?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8&w=1000&q=80'))
     # false
-    print(has_human('http://mobileimages.lowes.com/productimages/fcdcacf3-25c8-45bc-b4d3-fb3a96957aa7/10582769.jpg'))
+    print(has_girl('http://mobileimages.lowes.com/productimages/fcdcacf3-25c8-45bc-b4d3-fb3a96957aa7/10582769.jpg'))

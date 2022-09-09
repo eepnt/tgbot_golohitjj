@@ -28,10 +28,7 @@ def recv_request():
           "resp": rt,
         })
 
-        if rt < 0:
-            return "TRUE"
-        else:
-            return "FALSE"
+        return str(rt)
 
     except Exception as e:
         import traceback

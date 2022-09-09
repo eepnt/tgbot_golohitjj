@@ -42,20 +42,21 @@ def recv_tgmsg():
         file_link = 'https://api.telegram.org/file/bot{}/{}'.format(tgbot_token, get_file["result"]["file_path"]) 
 
         result = requests.post('https://human-dot-goloscorerbot.dt.r.appspot.com', json={'link':file_link})
+        try:
+            score = float(result.text)
 
-        if result.text == 'TRUE':
+            if score < 0.0:
+                return {
+                    "method": "sendMessage",
+                    "chat_id": data["message"]["chat"]["id"],
+                    'text': str(round(-score)),
+                    "reply_to_message_id": data["message"]["message_id"],
+                }
+            else:
+                return ""
+        except Exception as e:
+            logging.error(result, e)
             return ""
-        elif result.text == 'FALSE':
-            return {
-                "method": "sendMessage",
-                "chat_id": data["message"]["chat"]["id"],
-                'text': "nothing to j...",
-                "reply_to_message_id": data["message"]["message_id"],
-            }
-        else:
-            logging.error(result)
-            return ""
-
         # storage:
 
     except Exception as e:
